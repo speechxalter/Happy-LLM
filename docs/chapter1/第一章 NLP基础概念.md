@@ -191,6 +191,8 @@ NLP 的早期探索始于二战后，当时人们认识到将一种语言自动�
 
 ## 1.4 文本表示的发展历程
 
+<img src="C:\Users\胡天悦\AppData\Roaming\Typora\typora-user-images\image-20261117232922811.png" alt="image-20261117232922811" style="zoom:67%;" />
+
 文本表示的目的是**将人类语言的自然形式转化为计算机可以处理的形式**，也就是将**文本数据数字化**，使计算机能够对文本进行有效的分析和处理。文本表示是 NLP 领域中的一项基础性和必要性工作，它直接影响甚至决定着 NLP 系统的质量和性能。
 
 在 NLP 中，文本表示涉及到**将文本中的语言单位**（如字、词、短语、句子等）**以及它们之间的关系和结构信息转换为计算机能够理解和操作的形式**，例如向量、矩阵或其他数据结构。这样的表示不仅需要保留足够的语义信息，以便于后续的 NLP 任务，如文本分类、情感分析、机器翻译等，还需要考虑计算效率和存储效率。
@@ -284,19 +286,138 @@ N-gram的优点是实现简单、容易理解，在许多任务中效果不错�
 
 ### 1.4.3 Word2Vec
 
-Word2Vec是一种流行的词嵌入（Word Embedding）技术，由Tomas Mikolov等人在2013年提出。它是一种基于神经网络NNLM的语言模型，旨在通过学习词与词之间的上下文关系来生成词的密集向量表示。Word2Vec的核心思想是利用词在文本中的上下文信息来捕捉词之间的语义关系，从而使得语义相似或相关的词在向量空间中距离较近。
+Word2Vec是一种流行的**词嵌入（Word Embedding）技术**，由Tomas Mikolov等人在2013年提出。它是一种**基于神经网络NNLM的语言模型，**旨在通过学习**词与词之间的上下文关系来生成词的密集向量**进行表示。Word2Vec的核心思想是利用词在文本中的上下文信息来捕捉词之间的语义关系，从而使得**语义相似或相关的词在向量空间中距离较近**。
 
-Word2Vec模型主要有两种架构：连续词袋模型CBOW(Continuous Bag of Words)是根据目标词上下文中的词对应的词向量, 计算并输出目标词的向量表示；Skip-Gram模型与CBOW模型相反, 是利用目标词的向量表示计算上下文中的词向量. 实践验证CBOW适用于小型数据集, 而Skip-Gram在大型语料中表现更好。
+Word2Vec模型主要有两种架构：**连续词袋模型CBOW**(Continuous Bag of Words)是**根据目标词上下文中的词对应的词向量, 计算并输出目标词的向量表示**；**Skip-Gram模型**与CBOW模型相反, 是**利用目标词的向量表示计算上下文中的词向量**. 经典 Word2Vec 实验中，Skip-Gram 对低频词通常具有更好的表示效果。
 
-相比于传统的高维稀疏表示（如One-Hot编码），Word2Vec生成的是低维（通常几百维）的密集向量，有助于减少计算复杂度和存储需求。Word2Vec模型能够捕捉到词与词之间的语义关系，比如”国王“和“王后”在向量空间中的位置会比较接近，因为在大量文本中，它们通常会出现在相似的上下文中。Word2Vec模型也可以很好的泛化到未见过的词，因为它是基于上下文信息学习的，而不是基于词典。但由于CBOW/Skip-Gram模型是基于局部上下文的，无法捕捉到长距离的依赖关系，缺乏整体的词与词之间的关系，因此在一些复杂的语义任务上表现不佳。
+> [!NOTE]
+>
+> <img src="C:\Users\胡天悦\AppData\Roaming\Typora\typora-user-images\image-20261116112219554.png" alt="image-20261116112219554" style="zoom: 67%;" />
+
+相比于传统的高维稀疏表示（如One-Hot编码），Word2Vec生成的是**低维（通常几百维）的密集向量**，有助于减少**计算复杂度和存储需求**。Word2Vec模型能够捕捉到词与词之间的语义关系，比如”国王“和“王后”在向量空间中的位置会比较接近，因为**在大量文本中，它们通常会出现在相似的上下文中**。Word2Vec模型也可以很好的**泛化**到未见过的词，因为它是**基于上下文信息学习**的，而不是基于词典。但由于CBOW/Skip-Gram模型是**基于局部上下文**的，**无法捕捉到长距离的依赖关系**，缺乏整体的词与词之间的关系，因此在一些复杂的语义任务上表现不佳。
+
+> [!NOTE]
+>
+> CBOW和Skip-Gram是WordVec的两种核心训练架构：
+>
+> - CBOW：根据上下文预测中间的目标词，计算并输出目标词的向量表示
+> - Skip-Gram：根据中间的目标词的向量表示计算上下文中的词向量
+>
+> **例句：The quick brown fox jumps over the lazy dog.**
+>
+> 设置**窗口大小**：以某个词为中心，分别向左、向右最多选取n个词作为上下文
+>
+> <img src="C:\Users\胡天悦\AppData\Roaming\Typora\typora-user-images\image-20261116105128001.png" alt="image-20261116105128001" style="zoom:67%;" />
+>
+> 当窗口大小为2，目标词(Target Word)为brown时，我们的上下文(Context Words)包含The, quick, jumps, over
+>
+> #### CBOW：根据上下文预测目标词
+>
+> CBOW全称**Continuous Bag of Words**（**连续词袋模型**）
+>
+> 思想：把上下文中的多个词作为输入，让神经网络预测中间缺失的目标词
+>
+> 输入：{The, quick, fox, jumps}；输出：{brown}
+>
+> <img src="C:\Users\胡天悦\AppData\Roaming\Typora\typora-user-images\image-20261116105640485.png" alt="image-20261116105640485" style="zoom:50%;" />
+>
+> <img src="C:\Users\胡天悦\AppData\Roaming\Typora\typora-user-images\image-20261116105833799.png" alt="image-20261116105833799" style="zoom: 50%;" />
+>
+> <img src="C:\Users\胡天悦\AppData\Roaming\Typora\typora-user-images\image-20261116112438970.png" alt="image-20261116112438970" style="zoom:50%;" />
+>
+> <img src="C:\Users\胡天悦\AppData\Roaming\Typora\typora-user-images\image-20261116112633727.png" alt="image-20261116112633727" style="zoom:50%;" />
+>
+> <img src="C:\Users\胡天悦\Downloads\CBOW.jpg" alt="CBOW" style="zoom: 33%;" />
+>
+> #### Skip-Gram：根据目标词预测上下文
+>
+> 思想：**将目标词作为输入，让神经网络预测其周围的上下文。一个中心词可以产生多个训练样本**
+>
+> 输入：brown；输出：{The, quick, fox, jumps}
+>
+> <img src="C:\Users\胡天悦\AppData\Roaming\Typora\typora-user-images\image-20261116110938580.png" alt="image-20261116110938580" style="zoom: 50%;" />
+>
+> <img src="C:\Users\胡天悦\AppData\Roaming\Typora\typora-user-images\image-20261116111335924.png" alt="image-20261116111335924" style="zoom:50%;" />
+>
+> <img src="C:\Users\胡天悦\AppData\Roaming\Typora\typora-user-images\image-20261116111827636.png" alt="image-20261116111827636" style="zoom:50%;" />
+>
+> **语义**相近→**余弦相似度**较高
+>
+> 一种自监督学习方法的思想：设计合适的代理任务(Proxy Task)，让模型从数据中学习我们需要的表示(Representation Learning)
 
 ### 1.4.4 ELMo
 
-ELMo（Embeddings from Language Models）实现了一词多义、静态词向量到动态词向量的跨越式转变。首先在大型语料库上训练语言模型，得到词向量模型，然后在特定任务上对模型进行微调，得到更适合该任务的词向量，ELMo首次将预训练思想引入到词向量的生成中，使用双向LSTM结构，能够捕捉到词汇的上下文信息，生成更加丰富和准确的词向量表示。
+**ELMo**（Embeddings from Language Models）实现了**一词多义**、**静态词向量到动态词向量**的跨越式转变。
 
-ELMo采用典型的两阶段过程: 第1个阶段是利用语言模型进行预训练; 第2个阶段是在做特定任务时, 从预训练网络中提取对应单词的词向量作为新特征补充到下游任务中。基于RNN的LSTM模型训练时间长, 特征提取是ELMo模型优化和提升的关键。
+> [!NOTE]
+>
+> ELMo解决了Word2Vec无法实现一词多义的问题。一个词在不同上下文中含义可能不同，但 Word2Vec 无法为它们生成不同的词向量
+>
+> <img src="C:\Users\胡天悦\AppData\Roaming\Typora\typora-user-images\image-20261117223900141.png" alt="image-20261117223900141" style="zoom:67%;" />
 
-ELMo模型的主要优势在于其能够捕捉到词汇的多义性和上下文信息，生成的词向量更加丰富和准确，适用于多种 NLP 任务。然而，ELMo模型也存在一些问题，如模型复杂度高、训练时间长、计算资源消耗大等。
+> [!NOTE]
+>
+> #### ELMO的结构(Character CNN + BiLSTM + 词向量表示层)
+>
+> <img src="C:\Users\胡天悦\AppData\Roaming\Typora\typora-user-images\image-20261117224342432.png" alt="image-20261117224342432" style="zoom:67%;" />
+>
+> <img src="C:\Users\胡天悦\AppData\Roaming\Typora\typora-user-images\image-20261117225124413.png" alt="image-20261117225124413" style="zoom: 67%;" />
+>
+> <img src="C:\Users\胡天悦\AppData\Roaming\Typora\typora-user-images\image-20261117225307285.png" alt="image-20261117225307285" style="zoom:67%;" />
+>
+> <img src="C:\Users\胡天悦\AppData\Roaming\Typora\typora-user-images\image-20261117225338793.png" alt="image-20261117225338793" style="zoom:67%;" />
+>
+> BiLSTM的作用可以理解成，对于一个词，将其之前的上下文对应的隐藏状态，和其之后的上下文的隐藏状态拼接起来，这样就同时包含两侧的上下文信息
+>
+> <img src="C:\Users\胡天悦\AppData\Roaming\Typora\typora-user-images\image-20261117225523236.png" alt="image-20261117225523236" style="zoom:67%;" />
+>
+> ELMo会对不同层的表示进行加权组合，**允许下游任务学习如何组合不同层的表示**
+>
+> <img src="C:\Users\胡天悦\AppData\Roaming\Typora\typora-user-images\image-20261117230216317.png" alt="image-20261117230216317" style="zoom:67%;" />
+>
+> <img src="C:\Users\胡天悦\AppData\Roaming\Typora\typora-user-images\image-20261117230247631.png" alt="image-20261117230247631" style="zoom:50%;" />
+>
+> <img src="C:\Users\胡天悦\AppData\Roaming\Typora\typora-user-images\image-20261117231152513.png" alt="image-20261117231152513" style="zoom:67%;" />
+>
+> ##### 补充：为什么用极大似然函数作为目标函数？
+>
+> <img src="C:\Users\胡天悦\AppData\Roaming\Typora\typora-user-images\image-20261117231432930.png" alt="image-20261117231432930" style="zoom: 50%;" />
+>
+> ##### 为什么会取对数？
+>
+> <img src="C:\Users\胡天悦\AppData\Roaming\Typora\typora-user-images\image-20261117231530426.png" alt="image-20261117231530426" style="zoom: 50%;" />
+>
+> <img src="C:\Users\胡天悦\AppData\Roaming\Typora\typora-user-images\image-20261117231551517.png" alt="image-20261117231551517" style="zoom:50%;" />
+>
+> <img src="C:\Users\胡天悦\AppData\Roaming\Typora\typora-user-images\image-20261117232203266.png" alt="image-20261117232203266" style="zoom: 67%;" />
+>
+> <img src="C:\Users\胡天悦\AppData\Roaming\Typora\typora-user-images\image-20261117232230847.png" alt="image-20261117232230847" style="zoom:67%;" />
+
+>  首先在大型语料库上训练语言模型，得到**词向量模型**，然后在特定任务上对模型进行**微调**，得到**更适合该任务的词向量**，ELMo首次将**预训练思想**引入到词向量的生成中，使用**双向LSTM结构**（说明还是没用Tranformer），能够捕捉到词汇的上下文信息，生成更加丰富和准确的词向量表示。
+
+> [!NOTE]
+>
+> 上面这段有问题呀
+>
+> 表述应该是：**ELMo在第一阶段预训练阶段学习双向语言模型；第二阶段提取预训练模型的各层表示，通过任务专属的可学习权重进行加权组合，将生成的ELMo向量作为特征输入下游模型；**
+>
+> **经典 ELMo 的主要使用方式是特征提取，通常冻结预训练语言模型的参数，学习的是下游任务的层组合权重及缩放系数，以及下游模型自身的参数。**
+>
+> <img src="C:\Users\胡天悦\AppData\Roaming\Typora\typora-user-images\image-20261117232644823.png" alt="image-20261117232644823" style="zoom:67%;" />
+>
+> <img src="C:\Users\胡天悦\AppData\Roaming\Typora\typora-user-images\image-20261117232844112.png" alt="image-20261117232844112" style="zoom: 67%;" />
+
+
+
+ELMo采用典型的两阶段过程: 第1个阶段是**利用语言模型进行预训练**; 第2个阶段是在做**特定任务**时, 从预训练网络中**提取对应单词的词向量作为新特征补充到下游任务中**。
+
+<img src="C:\Users\胡天悦\AppData\Roaming\Typora\typora-user-images\image-20261117233157165.png" alt="image-20261117233157165" style="zoom: 67%;" />
+
+ELMo模型的主要优势在于其能够捕捉到**词汇的多义性**和**上下文信息**，生成的词向量更加**丰富和准确**，适用于多种 NLP 任务。然而，ELMo模型也存在一些问题，如模型复杂度高、训练时间长、计算资源消耗大等。
+
+#### 总结
+
+<img src="C:\Users\胡天悦\AppData\Roaming\Typora\typora-user-images\image-20261117233241283.png" alt="image-20261117233241283" style="zoom:67%;" />
 
 ## 参考文献
 

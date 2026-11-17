@@ -1,0 +1,8 @@
+The quick brown fox jumps over the lazy dog.
+The quick brown fox runs through the forest.
+The clever brown fox hides behind the tree.
+A quick brown dog runs through the forest.
+The slow red fox jumps over the river.
+The slow red fox runs through the field.
+The clever red fox hides behind the rock.
+A slow black dog sleeps near the house.
